@@ -1,0 +1,247 @@
+# sparkforge/config/default_config.yaml
+
+# SparkForge Default Configuration
+# This file contains default settings for the SparkForge framework
+
+# Spark Configuration
+spark:
+  app_name: "SparkForge_ML_Pipeline"
+  master: "local[*]" # Use all available cores locally
+  config:
+    spark.sql.adaptive.enabled: true
+    spark.sql.adaptive.coalescePartitions.enabled: true
+    spark.sql.adaptive.skewJoin.enabled: true
+    spark.serializer: "org.apache.spark.serializer.KryoSerializer"
+    spark.sql.execution.arrow.pyspark.enabled: true
+    spark.sql.execution.arrow.maxRecordsPerBatch: 10000
+    spark.sql.shuffle.partitions: 200
+    spark.sql.adaptive.advisoryPartitionSizeInBytes: "128MB"
+    spark.default.parallelism: 100
+
+# Feature Engineering Configuration
+feature_engineering:
+  # Time Series Features
+  time_series:
+    default_window_sizes: [3, 7, 14, 30, 90]
+    default_lag_sizes: [1, 2, 3, 7, 14, 30]
+    enable_seasonality: true
+    seasonal_periods: [7, 30, 365] # Daily, monthly, yearly
+    enable_trend: true
+    enable_volatility: true
+
+  # Text Features
+  text:
+    enable_basic_stats: true
+    enable_readability: true
+    enable_sentiment: true
+    enable_complexity: true
+    max_vocab_size: 10000
+    min_doc_freq: 2
+    max_doc_freq: 0.95
+    ngram_ranges:
+      unigrams: [1, 1]
+      bigrams: [2, 2]
+      trigrams: [3, 3]
+
+  # Numerical Features
+  numerical:
+    enable_polynomial: true
+    polynomial_degree: 2
+    enable_interactions: true
+    max_interaction_depth: 2
+    enable_binning: true
+    default_bins: 10
+    enable_scaling: true
+    scaling_method: "standard" # standard, minmax, robust
+
+  # Categorical Features
+  categorical:
+    encoding_method: "onehot" # onehot, target, binary, ordinal
+    max_categories: 1000
+    handle_unknown: "ignore"
+    min_frequency: 5
+    enable_target_encoding: false
+    target_encoding_smoothing: 1.0
+
+  # Feature Selection
+  feature_selection:
+    enable_selection: true
+    selection_methods: ["variance", "correlation", "statistical"]
+    variance_threshold: 0.01
+    correlation_threshold: 0.95
+    statistical_method: "chi2" # chi2, f_classif, mutual_info
+    k_best: 100
+    percentile: 80
+
+# Model Training Configuration
+models:
+  # Problem types
+  classification:
+    algorithms:
+      - "random_forest"
+      - "gradient_boosting"
+      - "logistic_regression"
+      - "svm"
+      - "naive_bayes"
+    default_algorithms:
+      ["random_forest", "gradient_boosting", "logistic_regression"]
+
+  regression:
+    algorithms:
+      - "random_forest"
+      - "gradient_boosting"
+      - "linear_regression"
+      - "svm"
+      - "decision_tree"
+    default_algorithms:
+      ["random_forest", "gradient_boosting", "linear_regression"]
+
+  # Hyperparameter tuning
+  hyperparameter_tuning:
+    enable_tuning: true
+    method: "grid_search" # grid_search, random_search
+    cross_validation_folds: 3
+    max_iterations: 20
+    parallelism: 4
+
+  # Model parameters
+  random_forest:
+    num_trees: [10, 50, 100]
+    max_depth: [5, 10, 15]
+    min_instances_per_node: [1, 5, 10]
+
+  gradient_boosting:
+    max_iter: [50, 100, 200]
+    max_depth: [3, 5, 7]
+    step_size: [0.01, 0.1, 0.3]
+
+  logistic_regression:
+    reg_param: [0.01, 0.1, 1.0]
+    elastic_net_param: [0.0, 0.5, 1.0]
+    max_iter: [100, 200]
+
+  linear_regression:
+    reg_param: [0.01, 0.1, 1.0]
+    elastic_net_param: [0.0, 0.5, 1.0]
+    max_iter: [100, 200]
+
+# Ensemble Configuration
+ensemble:
+  methods: ["voting", "stacking", "blending"]
+  default_method: "stacking"
+
+  voting:
+    voting_type: "soft" # hard, soft
+
+  stacking:
+    use_cross_validation: true
+    cv_folds: 3
+    meta_algorithm: "logistic_regression"
+
+  blending:
+    blend_ratio: 0.2
+    enable_optimization: true
+
+# Evaluation Configuration
+evaluation:
+  # Classification metrics
+  classification_metrics:
+    - "accuracy"
+    - "precision"
+    - "recall"
+    - "f1"
+    - "auc"
+    - "log_loss"
+
+  # Regression metrics
+  regression_metrics:
+    - "rmse"
+    - "mae"
+    - "r2"
+    - "explained_variance"
+
+  # Cross validation
+  cross_validation:
+    enable: true
+    folds: 5
+    stratified: true
+
+  # Model comparison
+  model_comparison:
+    enable: true
+    statistical_test: "paired_ttest"
+    significance_level: 0.05
+
+# Data Processing Configuration
+data:
+  # Data validation
+  validation:
+    enable_checks: true
+    max_missing_ratio: 0.3
+    min_rows: 100
+    check_duplicates: true
+
+  # Data splitting
+  splitting:
+    train_ratio: 0.7
+    validation_ratio: 0.15
+    test_ratio: 0.15
+    stratify: true
+    random_seed: 42
+
+  # Caching
+  caching:
+    enable_caching: true
+    storage_level: "MEMORY_AND_DISK"
+    checkpoint_interval: 100
+
+# Logging Configuration
+logging:
+  level: "INFO" # DEBUG, INFO, WARNING, ERROR
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  enable_spark_logging: false
+  log_to_file: false
+  log_file_path: "logs/sparkforge.log"
+
+# Performance Configuration
+performance:
+  # Memory management
+  memory:
+    executor_memory: "4g"
+    driver_memory: "2g"
+    max_result_size: "1g"
+
+  # Optimization
+  optimization:
+    enable_predicate_pushdown: true
+    enable_column_pruning: true
+    enable_constant_folding: true
+    broadcast_threshold: "10MB"
+
+  # Monitoring
+  monitoring:
+    enable_metrics: true
+    collect_stage_metrics: true
+    track_memory_usage: true
+
+# Output Configuration
+output:
+  # Model persistence
+  model_persistence:
+    enable_save: true
+    base_path: "models/"
+    format: "parquet" # parquet, delta, json
+    versioning: true
+
+  # Results
+  results:
+    save_predictions: true
+    save_feature_importance: true
+    save_metrics: true
+    output_path: "results/"
+
+  # Artifacts
+  artifacts:
+    save_pipeline: true
+    save_transformers: true
+    save_preprocessors: true
